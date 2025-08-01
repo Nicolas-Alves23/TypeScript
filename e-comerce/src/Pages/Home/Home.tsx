@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Footer from '../../Components/Footer';
+import { useNavigate } from 'react-router';
 
 interface Product {
     id: number;
@@ -16,16 +17,19 @@ function Home() {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalProducts, setTotalProducts] = useState<number>(0);
     const productsPerPage = 10;
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchAPI = async () => {
             try {
                 const skip = (currentPage - 1) * productsPerPage;
-                const response = await axios.get(`https://dummyjson.com/products?limit=${productsPerPage}&skip=${skip}`);
+                const response = await axios.get(
+                    `https://dummyjson.com/products?limit=${productsPerPage}&skip=${skip}`
+                );
                 setProducts(response.data.products);
-                setTotalProducts(response.data.total); // API retorna total de produtos
+                setTotalProducts(response.data.total);
             } catch (error) {
-                setError("Não foi possível puxar as informações da API");
+                setError('Não foi possível puxar as informações da API');
             }
         };
         fetchAPI();
@@ -43,47 +47,48 @@ function Home() {
 
     return (
         <>
-            <div style={{ padding: '20px' }}>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center',  }}>
+            <main className="p-5 min-h-screen flex flex-col">
+                <div className="flex flex-wrap justify-center gap-5">
                     {products.map((produto) => (
                         <div
                             key={produto.id}
-                            style={{
-                                border: '1px solid #ccc',
-                                borderRadius: '8px',
-                                padding: '16px',
-                                width: '250px',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                textAlign: 'center',
-                                backgroundColor: '#fff',
-                            }}
+                            onClick={() => navigate(`/produto/${produto.id}`)}
+                            className="cursor-pointer border border-gray-300 rounded-lg p-4 w-60 shadow-md bg-white flex flex-col items-center hover:shadow-lg transition"
                         >
                             <img
                                 src={produto.thumbnail}
                                 alt={produto.title}
-                                style={{ width: 'auto', height: '250px', objectFit: 'cover', borderRadius: '4px' }}
+                                className="h-54 w-auto object-cover rounded-md mb-3"
                             />
-                            <h3>{produto.title}</h3>
-                            <p style={{ fontWeight: 'bold', color: '#2d2d2d' }}>R$ {produto.price}</p>
+                            <h3 className="text-lg font-semibold text-center">{produto.title}</h3>
+                            <p className="font-bold text-gray-800 mt-1">R$ {produto.price}</p>
                         </div>
                     ))}
                 </div>
 
                 {/* Pagination Controls */}
-                <div style={{ textAlign: 'center', marginTop: '30px' }}>
-                    <button onClick={handlePrev} disabled={currentPage === 1}>
+                <div className="text-center mt-8">
+                    <button
+                        onClick={handlePrev}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 mr-4 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+                    >
                         ◀ Anterior
                     </button>
-                    <span style={{ margin: '0 20px' }}>
+                    <span className="mx-4 text-gray-700 font-medium">
                         Página {currentPage} de {totalPages}
                     </span>
-                    <button onClick={handleNext} disabled={currentPage === totalPages}>
+                    <button
+                        onClick={handleNext}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 ml-4 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+                    >
                         Próximo ▶
                     </button>
                 </div>
 
-                {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
-            </div>
+                {error && <p className="text-red-600 text-center mt-4">{error}</p>}
+            </main>
 
             <Footer />
         </>
